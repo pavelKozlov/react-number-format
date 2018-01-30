@@ -41,6 +41,15 @@ export function fixLeadingZero(numStr?: string) {
   return `${isNegative ? '-': ''}${beforeDecimal}${afterDecimal ? `.${afterDecimal}` : ''}`;
 }
 
+export function fixDecimalScale(numStr?: string, decimalScale: number) {
+  const {beforeDecimal, afterDecimal, hasNagation} = splitDecimal(numStr);
+  let newAfterDecimal = afterDecimal;
+  while (newAfterDecimal.length < decimalScale) {
+	  newAfterDecimal += '0';
+  }
+  return `${hasNagation ? '-': ''}${beforeDecimal}${newAfterDecimal ? `.${newAfterDecimal}` : ''}`;
+}
+
 export function splitString(str: string, index: number) {
   return [str.substring(0, index), str.substring(index)]
 }
@@ -49,9 +58,9 @@ export function splitString(str: string, index: number) {
  * limit decimal numbers to given scale
  * Not used .fixedTo because that will break with big numbers
  */
-export function limitToScale(numStr: string, scale: number, fixedDecimalScale: boolean) {
-  let str = ''
-  const filler = fixedDecimalScale ? '0' : '';
+export function limitToScale(numStr: string, scale: number) {
+  let str = '';
+  const filler = '';
   for (let i=0; i<=scale - 1; i++) {
     str += numStr[i] || filler;
   }
@@ -62,7 +71,7 @@ export function limitToScale(numStr: string, scale: number, fixedDecimalScale: b
  * This method is required to round prop value to given scale.
  * Not used .round or .fixedTo because that will break with big numbers
  */
-export function roundToPrecision(numStr: string, scale: number, fixedDecimalScale: boolean) {
+export function roundToPrecision(numStr: string, scale: number) {
   const shoudHaveDecimalSeparator = numStr.indexOf('.') !== -1 && scale;
   const {beforeDecimal, afterDecimal, hasNagation} = splitDecimal(numStr);
   const roundedDecimalParts = parseFloat(`0.${afterDecimal || '0'}`).toFixed(scale).split('.');
@@ -73,7 +82,7 @@ export function roundToPrecision(numStr: string, scale: number, fixedDecimalScal
     return current + roundedStr;
   }, roundedDecimalParts[0]);
 
-  const decimalPart = limitToScale(roundedDecimalParts[1] || '', (afterDecimal || '').length, fixedDecimalScale);
+  const decimalPart = limitToScale(roundedDecimalParts[1] || '', (afterDecimal || '').length);
   const negation = hasNagation ? '-' : '';
   const decimalSeparator = shoudHaveDecimalSeparator ? '.' : '';
   return `${negation}${intPart}${decimalSeparator}${decimalPart}`;

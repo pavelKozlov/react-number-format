@@ -176,13 +176,17 @@ describe('Test NumberFormat as input with numeric format options', () => {
     expect(wrapper.state().value).not.toEqual('4111.1112');
 
 
-    //case 3rd - shorter scale adds 0
+    //case 3rd - shorter scale adds 0 after blur
     input.simulate('change', getCustomEvent('4111.111'));
+    expect(wrapper.state().value).toEqual('4111.111');
+    input.simulate('blur', getCustomEvent());
     expect(wrapper.state().value).toEqual('4111.1110');
 
-    //case 4th - no decimal should round with 4 zeros
+    //case 4th - no decimal should round with 4 zeros after blur
     input.simulate('change', getCustomEvent(''));
     input.simulate('change', getCustomEvent('4111'));
+    expect(wrapper.state().value).toEqual('4111');
+	input.simulate('blur', getCustomEvent());
     expect(wrapper.state().value).toEqual('4111.0000');
 
     //case 5 - round with two decimal scale
